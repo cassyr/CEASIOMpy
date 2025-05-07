@@ -673,6 +673,7 @@ def refine_lines_with_acute_angles(
             if foundbigangle:
                 break
 
+    print("already le_te_refined", te_le_already_refined)
     lines_with_angles_tag = [l for l in lines_with_angles_tag if l not in te_le_already_refined]
     log.info(f"Lines to be refined are {lines_with_angles_tag}")
     log.info("Now start setting refinement")

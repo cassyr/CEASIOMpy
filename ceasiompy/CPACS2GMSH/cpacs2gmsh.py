@@ -50,6 +50,7 @@ from ceasiompy.utils.commonxpath import (
     GMSH_OPEN_GUI_XPATH,
     GMSH_REFINE_FACTOR_XPATH,
     GMSH_REFINE_TRUNCATED_XPATH,
+    GMSH_REFINE_FACTOR_SHARP_EDGES_XPATH,
     GMSH_SYMMETRY_XPATH,
     SU2MESH_XPATH,
     GMSH_MESH_TYPE_XPATH,
@@ -116,6 +117,8 @@ def cpacs2gmsh(cpacs_path, cpacs_out_path):
         cpacs.tixi, GMSH_REFINE_FACTOR_XPATH, 7.0)
     refine_truncated = get_value_or_default(
         cpacs.tixi, GMSH_REFINE_TRUNCATED_XPATH, False)
+    refine_factor_sharp_edges = get_value_or_default(
+        cpacs.tixi, GMSH_REFINE_FACTOR_SHARP_EDGES_XPATH, 2.0)
     auto_refine = get_value_or_default(
         cpacs.tixi, GMSH_AUTO_REFINE_XPATH, True)
     intake_percent = get_value_or_default(
@@ -174,6 +177,7 @@ def cpacs2gmsh(cpacs_path, cpacs_out_path):
             open_gmsh=open_gmsh,
             refine_factor=refine_factor,
             refine_truncated=refine_truncated,
+            refine_sharp_edges=refine_factor_sharp_edges,
             fuselage_mesh_size_factor=fuselage_mesh_size_factor,
             wing_mesh_size_factor=wing_mesh_size_factor,
             mesh_size_engines=mesh_size_engines,

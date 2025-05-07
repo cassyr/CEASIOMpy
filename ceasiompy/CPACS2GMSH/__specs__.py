@@ -15,6 +15,7 @@ from ceasiompy.utils.commonxpath import (
     GMSH_MESH_SIZE_PROPELLERS_XPATH,
     GMSH_OPEN_GUI_XPATH,
     GMSH_REFINE_TRUNCATED_XPATH,
+    GMSH_REFINE_FACTOR_SHARP_EDGES_XPATH,
     GMSH_REFINE_FACTOR_XPATH,
     GMSH_SYMMETRY_XPATH,
     SU2MESH_XPATH,
@@ -214,6 +215,18 @@ cpacs_inout.add_input(
     xpath=GMSH_AUTO_REFINE_XPATH,
     gui=True,
     gui_name="Auto refine",
+    gui_group="Advanced Euler mesh parameters",
+)
+
+cpacs_inout.add_input(
+    var_name="refine_factor_sharp_edges",
+    var_type=float,
+    default_value=1.0,
+    unit="1",
+    descr="Refinement factor of other sharp edges mesh",
+    xpath=GMSH_REFINE_FACTOR_SHARP_EDGES_XPATH,
+    gui=True,
+    gui_name="other sharp edges refinement factor",
     gui_group="Advanced Euler mesh parameters",
 )
 

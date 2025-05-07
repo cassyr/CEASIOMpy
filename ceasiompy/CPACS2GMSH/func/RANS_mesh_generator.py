@@ -72,7 +72,7 @@ log = get_logger()
 
 def generate_2d_mesh_for_pentagrow(
     cpacs, cpacs_path, brep_dir, results_dir, open_gmsh,
-    refine_factor=2.0, refine_truncated=False, n_power_factor=2, n_power_field=0.9,
+    refine_factor=2.0, refine_truncated=False, refine_factor_sharp_edges=2.0, n_power_factor=2, n_power_field=0.9,
     fuselage_mesh_size_factor=1, wing_mesh_size_factor=1.5, mesh_size_engines=0.23, mesh_size_propellers=0.23, auto_refine=False, farfield_size_factor=10
 ):
     """
@@ -81,6 +81,7 @@ def generate_2d_mesh_for_pentagrow(
     mesh file useful for pentagrow.
     The airplane is fused with the different brep files : fuselage, wings and
     other parts are identified and fused together in order to obtain a watertight volume.
+    Physical groups are also created, and some refining function are called.
     Args:
     ----------
     cpacs : CPACS
@@ -97,6 +98,8 @@ def generate_2d_mesh_for_pentagrow(
         Factor of refinement along le and te of wings
     refine_truncated : bool
         If set to true, the refinement can change to match the truncated te thickness
+    refine_factor_sharp_edges :float
+        Factor of refinement along the edges that are sharp but not le and te
     n_power_factor : float
         Power of how much refinement on the le and te (and for now in the "refine acute angle" as well)
     n_power_field: float
@@ -261,9 +264,11 @@ def generate_2d_mesh_for_pentagrow(
         te_le_already_refined = []
 
     log.info("Refinement process of other lines started")
-    mesh_fields = refine_lines_with_acute_angles(te_le_already_refined, refine=refine_factor,
-                                                 aircraft_parts=aircraft_parts, mesh_fields=mesh_fields, mesh_size_by_part=mesh_size_by_group, n_power=n_power_factor)
-    mesh_fields = min_fields(mesh_fields)
+    yes = True
+    if auto_refine and refine_factor != 1 or yes:
+        mesh_fields = refine_lines_with_acute_angles(te_le_already_refined, refine=refine_factor_sharp_edges,
+                                                     aircraft_parts=aircraft_parts, mesh_fields=mesh_fields, mesh_size_by_part=mesh_size_by_group, n_power=n_power_factor)
+        mesh_fields = min_fields(mesh_fields)
     log.info("Refining process finished")
     gmsh.model.occ.synchronize()
 
@@ -630,7 +635,9 @@ def refine_le_te(
                 f" {len(model_part.wing_sections)} section(s) found "
             )
             new_lines = [x['lines_tags'] for x in model_part.wing_sections]
-            lines_refined.extend(new_lines[0])
+            print("te and le, for wing", model_part.uid, model_part.wing_sections, new_lines)
+            for i in range(len(new_lines)):
+                lines_refined.extend(new_lines[i])
 
     # tag of the main volume constituing the aicraft, and of all the surfaces
     final_domain_volume_tag = gmsh.model.occ.getEntities(
